@@ -11,7 +11,7 @@ orders AS (
         order_id,
         customer_id,
         order_date,
-        status as order_status
+        order_status
     FROM {{ ref('stg_jaffle_shop__orders') }}
 ),
 
