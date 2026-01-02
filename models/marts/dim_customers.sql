@@ -8,10 +8,10 @@ WITH customers AS (
 
 orders AS (
     SELECT
-        order_id,
         customer_id,
+        order_id,
         order_date,
-        order_status
+        amount
     FROM {{ ref('fct_orders') }}
 ),
 
@@ -21,7 +21,7 @@ customer_orders AS (
         MIN(order_date) AS first_order_date,
         MAX(order_date) AS most_recent_order_date,
         COUNT(order_id) AS number_of_orders,
-        SUM(p.amount) AS lifetime_value
+        SUM(amount) AS lifetime_value
     FROM orders
     GROUP BY customer_id
 ),
