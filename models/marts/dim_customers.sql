@@ -1,10 +1,10 @@
 WITH
   customers AS (
-    SELECT * FROM {{ ref('stg_jaffler_store__customers') }}
+    SELECT * FROM {{ ref('stg_jaffler_shop__customers') }}
   ),
 
   orders AS (
-    SELECT * FROM {{ ref('stg_jaffler_store__orders') }}
+    SELECT * FROM {{ ref('stg_jaffler_shop__orders') }}
   ),
 
   customer_orders AS (
