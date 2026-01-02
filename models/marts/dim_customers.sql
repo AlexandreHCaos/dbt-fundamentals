@@ -12,43 +12,31 @@ orders AS (
         customer_id,
         order_date,
         order_status
-    FROM {{ ref('stg_jaffle_shop__orders') }}
-),
-
-payments AS (
-    SELECT
-        order_id,
-        amount,
-        payment_status
-    FROM {{ ref('stg_stripe__payments') }}
-    WHERE payment_status = 'success'
+    FROM {{ ref('fct_orders') }}
 ),
 
 customer_orders AS (
     SELECT
-        o.customer_id,
-        MIN(o.order_date) AS first_order_date,
-        MAX(o.order_date) AS most_recent_order_date,
-        COUNT(DISTINCT o.order_id) AS number_of_orders,
-        COALESCE(SUM(p.amount), 0) AS lifetime_value
-    FROM orders o
-    LEFT JOIN payments p
-        ON o.order_id = p.order_id
-    GROUP BY o.customer_id
+        customer_id,
+        MIN(order_date) AS first_order_date,
+        MAX(order_date) AS most_recent_order_date,
+        COUNT(order_id) AS number_of_orders,
+        SUM(p.amount) AS lifetime_value
+    FROM orders
+    GROUP BY customer_id
 ),
 
 final AS (
     SELECT
-        c.customer_id,
-        c.first_name,
-        c.last_name,
-        co.first_order_date,
-        co.most_recent_order_date,
-        COALESCE(co.number_of_orders, 0) AS number_of_orders,
-        COALESCE(co.lifetime_value, 0) AS lifetime_value
-    FROM customers c
-    LEFT JOIN customer_orders co
-        ON c.customer_id = co.customer_id
+        customers.customer_id,
+        customers.first_name,
+        customers.last_name,
+        customer_orders.first_order_date,
+        customer_orders.most_recent_order_date,
+        COALESCE(customer_orders.number_of_orders, 0) AS number_of_orders,
+        COALESCE(customer_orders.lifetime_value, 0) AS lifetime_value
+    FROM customers
+    LEFT JOIN customer_orders USING(customer_id)
 )
 
 SELECT * FROM final

@@ -3,16 +3,26 @@ customers AS (
     SELECT * FROM {{ ref('stg_jaffle_shop__customers') }}
 ),
 
+payments AS (
+    SELECT * FROM {{ ref('stg_stripe__payments') }}
+),
+
 orders_payments AS (
-    SELECT * FROM {{ ref('stg_jaffle_shop__orders') }}
-    LEFT JOIN {{ ref('stg_stripe__payments') }} USING (order_id)
+    SELECT
+        order_id,
+        sum (CASE WHEN payment_status = 'success' THEN amount END) AS amount
+    FROM payments
+    GROUP BY 1
 ),
 
 final AS (
     SELECT
-        *
-    FROM customers
-    LEFT JOIN orders_payments USING(customer_id)
+        orders.order_id,
+        orders.customer_id,
+        orders.order_date,
+        coalesce (order_payments.amount, 0) AS amount
+    FROM orders
+    LEFT JOIN order_payments USING (order_id)
 )
 
 SELECT * FROM final
