@@ -1,13 +1,13 @@
 WITH
-customers AS (
-    SELECT * FROM {{ ref('stg_jaffle_shop__customers') }}
+orders AS (
+    SELECT * FROM {{ ref('stg_jaffle_shop__orders') }}
 ),
 
 payments AS (
     SELECT * FROM {{ ref('stg_stripe__payments') }}
 ),
 
-orders_payments AS (
+order_payments AS (
     SELECT
         order_id,
         sum (CASE WHEN payment_status = 'success' THEN amount END) AS amount
