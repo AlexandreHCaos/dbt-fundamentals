@@ -1,0 +1,21 @@
+models:
+- name: stg_stripe__payments
+  description: This model processes payment data from Stripe, transforming it for
+    analysis. It includes details about each payment transaction, such as the order
+    it is associated with, its status, and the amount processed.
+  columns:
+  - name: id
+    description: Unique identifier for each payment transaction.
+    data_tests:
+      - unique
+      - not_null
+  - name: order_id
+    description: Identifier for the order associated with the payment.
+    data_tests:
+      - not_null
+  - name: payment_status
+    description: Current status of the payment, indicating whether it is completed,
+      pending, or failed.
+  - name: amount
+    description: The amount processed in the payment, converted to the main currency
+      unit.
